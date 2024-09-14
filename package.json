@@ -1,0 +1,16 @@
+{
+  "name": "gemini-lrc-generator",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "next start",
+    "build": "next build",
+    "dev": "next dev"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.13.0",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "formidable": "^2.0.1"
+  }
+}
