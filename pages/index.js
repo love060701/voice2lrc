@@ -6,6 +6,18 @@ export default function Home() {
   const [lrcContent, setLrcContent] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const maxFileSize = 4 * 1024 * 1024; // 4MB
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile.size > maxFileSize) {
+      alert('文件大小超过 4MB 限制，请选择较小的文件。');
+      e.target.value = ''; // 重置文件输入
+    } else {
+      setFile(selectedFile);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -26,9 +38,18 @@ export default function Home() {
         body: formData,
       });
 
+      const contentType = res.headers.get('content-type');
+
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || '处理失败，请检查 API Key 和音频文件。');
+        let errorMessage = '处理失败，请检查 API Key 和音频文件。';
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await res.json();
+          errorMessage = errorData.error || errorMessage;
+        } else {
+          const text = await res.text();
+          errorMessage = text || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await res.json();
@@ -67,11 +88,11 @@ export default function Home() {
           />
         </div>
         <div>
-          <label>上传音频文件 (mp3, wav, aac, flac):</label>
+          <label>上传音频文件 (mp3, wav, aac, flac，最大 4MB):</label>
           <input
             type="file"
             accept=".mp3,.wav,.aac,.flac"
-            onChange={(e) => setFile(e.target.files[0])}
+            onChange={handleFileChange}
             style={{ display: 'block', marginTop: '5px', marginBottom: '15px' }}
           />
         </div>
@@ -87,4 +108,3 @@ export default function Home() {
     </div>
   );
 }
-
